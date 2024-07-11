@@ -1,0 +1,10 @@
+[package]
+name = "mk8d_live_stats"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+image = "0.25.1"
+image-compare = "0.4.1"
+strum = "0.26.3"
+strum_macros = "0.26.4"
