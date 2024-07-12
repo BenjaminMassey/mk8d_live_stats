@@ -20,8 +20,9 @@ pub fn get_items(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -> da
         (SECOND_SPOT.1.0 * full_shot.width() as f64) as u32,
         (SECOND_SPOT.1.1 * full_shot.height() as f64) as u32,
     ).to_image();
-    let item_choices = std::fs::read_dir("./icons/items/")
+    let item_choices = std::fs::read_dir("./icons/items/raw")
         .unwrap()
+        .chain(std::fs::read_dir("./icons/items/screenshots").unwrap())
         .map(|f| f.unwrap().path().to_owned())
         .collect::<Vec<std::path::PathBuf>>();
     let mut items: Vec<String> = vec![];
