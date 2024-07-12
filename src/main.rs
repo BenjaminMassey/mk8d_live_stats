@@ -11,5 +11,7 @@ fn main() {
     println!("{:?} and {:?}",
         player.items.first,
         player.items.second,
-    )
+    );
+    let placement = image_proc::get_placement(&full_shot);
+    println!("{}", placement);
 }
