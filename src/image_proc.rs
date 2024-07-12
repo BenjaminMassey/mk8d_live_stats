@@ -1,3 +1,5 @@
+use image::GenericImageView;
+
 use crate::data;
 
 use std::str::FromStr;
@@ -64,7 +66,6 @@ pub fn get_items(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -> da
     }
 }
 
-// TODO: not very good
 pub fn get_placement(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -> u8 {
     let placement_area = image::SubImage::new(
         full_shot,
@@ -73,23 +74,37 @@ pub fn get_placement(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -
         (PLACEMENT_SPOT.1.0 * full_shot.width() as f64) as u32,
         (PLACEMENT_SPOT.1.1 * full_shot.height() as f64) as u32,
     ).to_image();
-    let placements = std::fs::read_dir("./icons/placements/1")
+    let background_color = placement_area.get_pixel(0, 0).0;
+    let placements = std::fs::read_dir("./icons/placements")
         .unwrap()
-        .chain(std::fs::read_dir("./icons/placements/2").unwrap())
         .map(|f| f.unwrap().path().to_owned())
         .collect::<Vec<std::path::PathBuf>>();
     let mut max = -1f64;
     let mut result = 0u8;
     for placement in &placements {
-        let placement_image = image::open(placement)
+        let original_placement_image = image::open(placement)
             .expect("Could not load item icon")
             .resize_exact(
                 placement_area.width(),
                 placement_area.height(),
-                image::imageops::FilterType::Nearest
+                image::imageops::FilterType::Nearest,
+            );
+        let placement_image = image::ImageBuffer::from_fn(
+            original_placement_image.width(),
+            original_placement_image.height(),
+            |x, y| {
+                let pixel = original_placement_image.get_pixel(x, y);
+                if pixel.0[3] == 0 {
+                    image::Rgba(background_color)
+                } else {
+                    image::Rgba(pixel.0)
+                }
+            }
+        );
+        let similarity = image_compare::rgba_hybrid_compare(
+                &placement_area,
+                &placement_image,
             )
-            .into_rgba8();
-        let similarity = image_compare::rgba_hybrid_compare(&placement_area, &placement_image)
             .expect("Images compare failed")
             .score;
         if similarity > max {

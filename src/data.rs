@@ -29,4 +29,5 @@ pub struct Items {
 
 pub struct Player {
     pub items: Items,
-} // TODO: other elements such as placement or something
+    pub placement: u8,
+}
