@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+enigo = "0.2.1"
 image = "0.25.1"
 image-compare = "0.4.1"
+screenshots = "0.8.10"
 strum = "0.26.3"
 strum_macros = "0.26.4"

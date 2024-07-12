@@ -4,6 +4,7 @@ pub enum Item {
     Blooper,
     BlueShell,
     BombOmb,
+    Boo,
     Boomerang,
     BulletBill,
     Coin,

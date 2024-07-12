@@ -4,6 +4,7 @@ use crate::data;
 
 use std::str::FromStr;
 
+const IMAGE_THRESHOLD: f64 = 0.15;
 const FIRST_ITEM_SPOT: ((f64, f64), (f64, f64)) = 
     ((0.09619, 0.10112), (0.07441, 0.13804));
 const SECOND_ITEM_SPOT: ((f64, f64), (f64, f64)) =
@@ -31,10 +32,10 @@ pub fn get_items(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -> da
         .chain(std::fs::read_dir("./icons/items/screenshots").unwrap())
         .map(|f| f.unwrap().path().to_owned())
         .collect::<Vec<std::path::PathBuf>>();
-    let mut items: Vec<String> = vec![];
-    for item_spot in &vec![image_one, image_two] {
+    let mut items = data::Items{ first: None, second: None };
+    for (i, item_spot) in vec![image_one, image_two].iter().enumerate() {
         let mut max = -1f64;
-        let mut result = String::new();
+        let mut result: Option<data::Item> = None;
         for item_choice in &item_choices {
             let item_image = image::open(item_choice)
                 .expect("Could not load item icon")
@@ -55,15 +56,27 @@ pub fn get_items(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -> da
                     .to_str()
                     .unwrap()
                     .to_owned();
-                result = file_name[..(file_name.len() - 4)].to_owned();
+                if similarity > IMAGE_THRESHOLD {
+                    if file_name.contains("Nothing") {
+                        result = None;
+                    } else {
+                        println!("{file_name}");
+                        result = Some(
+                            data::Item::from_str(
+                                &file_name[..(file_name.len() - 4)]
+                            ).unwrap()
+                        );
+                    }
+                }
             }
         }
-        items.push(result);
+        if i == 0 {
+            items.first = result;
+        } else {
+            items.second = result;
+        }
     }
-    data::Items { 
-        first: Some(data::Item::from_str(&items[0]).unwrap()),
-        second: Some(data::Item::from_str(&items[1]).unwrap()),
-    }
+    items
 }
 
 pub fn get_placement(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -> u8 {
