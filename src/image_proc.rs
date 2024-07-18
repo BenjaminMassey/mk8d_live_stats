@@ -60,7 +60,6 @@ pub fn get_items(full_shot: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) -> da
                     if file_name.contains("Nothing") {
                         result = None;
                     } else {
-                        println!("{file_name}");
                         result = Some(
                             data::Item::from_str(
                                 &file_name[..(file_name.len() - 4)]
