@@ -3,9 +3,9 @@ mod image_proc;
 mod screen;
 
 fn main() {
-    print!("top left and enter");
+    println!("top left and enter");
     let top_left = screen::get_screen_point();
-    print!("bottom right and enter");
+    println!("bottom right and enter");
     let bottom_right = screen::get_screen_point();
     let screen = screenshots::Screen::from_point(0, 0).unwrap();
     loop {
